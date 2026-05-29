@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ṗerSe — Menú</title>
+  <meta name="description" content="Menú completo de ṗerSe. Entradas, ceviches, fondos, cortes, pizzas y bebidas. Barbaquillo, Manta." />
+  <style>
+    @font-face {
+      font-family: 'Baby Doll';
+      src: url('assets/Baby Doll.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+  </style>
+  <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/chillink" />
+
+  <style>
+    :root {
+      --green:  #1A3D2B;
+      --cream:  #F7F4EF;
+      --white:  #FFFFFF;
+      --black:  #111111;
+      --muted:  #767370;
+      --border: #DDD9D2;
+      --outer:  clamp(28px, 5vw, 72px);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Helvetica Now Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: url('assets/fondo1.png') repeat; background-size: 400px auto;
+      color: var(--black);
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Header — transparent ─────────────────────────────── */
+    #header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      height: 64px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0 var(--outer);
+      background: transparent;
+      border-bottom: none;
+    }
+
+    .header-left  { display: flex; align-items: center; }
+    .header-right { display: flex; align-items: center; justify-content: flex-end; }
+
+    .header-logo {
+      display: flex; align-items: center; justify-content: center;
+    }
+    .header-logo img {
+      height: 28px; width: auto; object-fit: contain;
+      filter: brightness(0); transition: opacity 0.2s;
+    }
+    .header-logo:hover img { opacity: 0.7; }
+
+    .burger {
+      background: none; border: none; cursor: pointer;
+      padding: 4px; display: flex; flex-direction: column; gap: 5px;
+    }
+    .burger span {
+      display: block; width: 20px; height: 1px; background: var(--black);
+    }
+
+    .ig-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--black); display: flex; align-items: center;
+      transition: opacity 0.2s;
+    }
+    .ig-btn:hover { opacity: 0.6; }
+    .ig-btn svg { width: 19px; height: 19px; }
+
+    /* ── Nav drawer ─────────────────────────────────────────── */
+    #nav-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+      z-index: 290; opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    #nav-backdrop.open { opacity: 1; pointer-events: all; }
+
+    #nav-overlay {
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: min(400px, 82vw);
+      background: var(--green); z-index: 300;
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 24px 36px 36px;
+      transform: translateX(-100%);
+      transition: transform 0.4s cubic-bezier(0.76, 0, 0.24, 1);
+      box-shadow: 6px 0 32px rgba(0,0,0,0.18);
+    }
+    #nav-overlay.open { transform: translateX(0); }
+
+    .nav-top { display: flex; justify-content: flex-end; }
+
+    .nav-close {
+      background: none; border: none; color: rgba(247,244,239,0.7);
+      font-family: inherit; font-size: 1.4rem; cursor: pointer;
+      line-height: 1; padding: 4px; transition: color 0.2s;
+    }
+    .nav-close:hover { color: var(--cream); }
+
+    .nav-links {
+      display: flex; flex-direction: column; gap: 4px;
+      flex: 1; justify-content: center;
+    }
+    .nav-links a {
+      font-size: clamp(1rem, 2.5vw, 1.25rem); font-weight: 400;
+      letter-spacing: 0.01em; color: rgba(247,244,239,0.85); line-height: 1;
+      padding: 10px 0; border-bottom: 1px solid rgba(247,244,239,0.1);
+      display: flex; justify-content: space-between; align-items: center;
+      transition: color 0.2s;
+    }
+    .nav-links a:last-child { border-bottom: none; }
+    .nav-links a:hover { color: var(--cream); }
+    .nav-links a .arrow { font-size: 0.85em; opacity: 0.5; }
+
+    .nav-location {
+      font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(247,244,239,0.4); margin-bottom: 16px;
+    }
+    .nav-ig {
+      display: flex; align-items: center; gap: 8px;
+      color: rgba(247,244,239,0.6); font-size: 0.8rem; transition: color 0.2s;
+    }
+    .nav-ig:hover { color: var(--cream); }
+    .nav-ig svg { width: 18px; height: 18px; }
+
+    /* ── Menu sticky top bar ─────────────────────────────────── */
+    #menu-bar {
+      position: sticky;
+      top: 64px;
+      z-index: 100;
+      background: var(--green);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 var(--outer);
+      height: 50px;
+      gap: 16px;
+    }
+
+    /* Category quick-nav */
+    .cat-scroll {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex: 1;
+    }
+    .cat-scroll::-webkit-scrollbar { display: none; }
+
+    .cat-jump {
+      background: none; border: none; border-bottom: 2px solid transparent;
+      font-family: inherit; font-size: 0.7rem; font-weight: 500;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(247,244,239,0.6); padding: 0 16px; height: 50px;
+      cursor: pointer; white-space: nowrap;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .cat-jump:hover, .cat-jump.active { color: var(--cream); border-bottom-color: var(--cream); }
+
+    /* Language toggle */
+    .lang-toggle {
+      display: flex; border: 1px solid rgba(247,244,239,0.3);
+      border-radius: 2px; overflow: hidden; flex-shrink: 0;
+    }
+    .lang-btn {
+      background: none; border: none; font-family: inherit;
+      font-size: 0.68rem; font-weight: 500; letter-spacing: 0.16em;
+      text-transform: uppercase; padding: 6px 14px;
+      cursor: pointer; color: rgba(247,244,239,0.6);
+      transition: background 0.2s, color 0.2s;
+    }
+    .lang-btn.active { background: var(--cream); color: var(--green); }
+
+    /* ── Page content ─────────────────────────────────────────── */
+    main { padding-top: 114px; /* 64px header + 50px menu-bar */ }
+
+    /* ── Menu section ─────────────────────────────────────────── */
+    .menu-section {
+      padding: clamp(24px, 4vh, 40px) var(--outer);
+      border-bottom: 1px solid var(--border);
+    }
+    .menu-section:last-child { border-bottom: none; }
+
+    .section-head { margin-bottom: clamp(28px, 4vh, 44px); }
+
+    .section-eyebrow { display: none; }
+
+    .section-name {
+      font-size: clamp(2.4rem, 6vw, 5.5rem); font-weight: 900;
+      line-height: 0.95; letter-spacing: -0.05em; text-transform: uppercase;
+      color: var(--green);
+    }
+
+    .section-sub {
+      margin-top: 10px; font-size: 0.82rem; color: var(--muted);
+      font-style: italic;
+    }
+
+    /* Sub-section within a menu section (e.g. Rollos / Bowls inside Crudos) */
+    .sub-section { margin-top: clamp(32px, 4vh, 48px); }
+    .sub-section-name {
+      font-family: 'Baby Doll', 'Arial', sans-serif;
+      font-size: clamp(1rem, 2vw, 1.4rem); font-weight: 400;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      color: var(--green);
+      padding-bottom: 12px; border-bottom: 1px solid var(--border);
+      margin-bottom: 0;
+    }
+
+    /* Pizzas section title uses CHILLINK — lowercase */
+    #pizzas .section-name {
+      font-family: 'Chillink', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      letter-spacing: -0.02em;
+      text-transform: none;
+    }
+
+    /* Items */
+    .items { }
+
+    .item {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 20px;
+      padding: 18px 0; border-bottom: 1px solid var(--border);
+    }
+    .item:last-child { border-bottom: none; }
+
+    .item-body { flex: 1; }
+
+    .item-name {
+      font-size: clamp(1rem, 1.6vw, 1.2rem); font-weight: 800;
+      color: var(--black); line-height: 1.2;
+      text-transform: uppercase; letter-spacing: -0.02em;
+    }
+
+    .item-name-en {
+      font-size: 0.78rem; font-weight: 400; color: var(--muted);
+      margin-top: 1px; display: none;
+    }
+
+    body.lang-en .item-name-en { display: block; }
+
+    .item-desc {
+      font-size: 0.8rem; color: var(--muted); margin-top: 4px;
+      line-height: 1.55; max-width: 600px;
+    }
+
+    .item-tags {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;
+    }
+    .tag {
+      font-size: 0.65rem; font-weight: 500; letter-spacing: 0.1em;
+      text-transform: uppercase; border: 1px solid var(--border);
+      color: var(--muted); padding: 2px 8px; border-radius: 2px;
+    }
+
+    .item-price {
+      font-size: 0.88rem; font-weight: 500; color: var(--green);
+      white-space: nowrap; flex-shrink: 0;
+    }
+
+    /* Sides grid — 2 balanced columns, price always right-aligned */
+    .sides-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: clamp(20px, 4vw, 60px);
+    }
+    .sides-grid .item {
+      /* Keep border only on bottom within each column */
+    }
+    @media (max-width: 600px) {
+      .sides-grid { grid-template-columns: 1fr; }
+    }
+
+    /* VAT note */
+    .vat-note {
+      margin-top: 20px; font-size: 0.7rem; color: var(--muted);
+      letter-spacing: 0.06em; font-style: italic;
+    }
+
+    /* ── Footer ───────────────────────────────────────────────── */
+    footer {
+      background: var(--green); padding: clamp(48px,8vh,80px) var(--outer) clamp(28px,4vh,40px);
+    }
+    .footer-rule {
+      border: none; border-top: 1px solid rgba(247,244,239,0.18);
+      margin-bottom: clamp(28px, 4vh, 44px);
+    }
+    .footer-info { margin-bottom: clamp(24px, 3vh, 36px); }
+    .footer-info p {
+      font-family: 'Helvetica Now Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: clamp(0.75rem, 1.4vw, 0.9rem);
+      font-weight: 700;
+      line-height: 1.85; color: rgba(247,244,239,0.72);
+      text-transform: uppercase;
+    }
+    .footer-info .gap { margin-top: 0.85em; }
+    .footer-ig {
+      display: inline-flex; align-items: center;
+      color: rgba(247,244,239,0.72); margin-top: clamp(18px, 2.5vh, 28px);
+      transition: color 0.2s;
+    }
+    .footer-ig:hover { color: var(--cream); }
+    .footer-ig svg { width: 22px; height: 22px; }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: clamp(28px, 4vh, 44px);
+      border-top: 1px solid rgba(247,244,239,0.1); padding-top: 18px;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .footer-copy {
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem; color: rgba(247,244,239,0.3);
+    }
+    .footer-nav { display: flex; gap: 24px; }
+    .footer-nav a {
+      font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(247,244,239,0.4); transition: color 0.2s;
+    }
+    .footer-nav a:hover { color: var(--cream); }
+
+    @media (max-width: 600px) {
+      .footer-info { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="lang-es">
+
+  <!-- ── Header ──────────────────────────────────────── -->
+  <header id="header">
+    <div class="header-left">
+      <button class="burger" id="burger" aria-label="Abrir navegación">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <a href="index.html" class="header-logo">
+      <img src="assets/perselogo.png" alt="ṗerSe" />
+    </a>
+    <div class="header-right">
+      <a href="https://www.instagram.com/perse.beach/" target="_blank" rel="noopener" class="ig-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.4">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+        </svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- ── Nav backdrop ────────────────────────────────── -->
+  <div id="nav-backdrop"></div>
+
+  <!-- ── Nav drawer ──────────────────────────────────── -->
+  <nav id="nav-overlay" role="dialog" aria-modal="true" aria-label="Navegación">
+    <div class="nav-top">
+      <button class="nav-close" id="nav-close" aria-label="Cerrar">&times;</button>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">Inicio</a>
+      <a href="menu.html">Menú <span class="arrow">→</span></a>
+      <a href="index.html#statement">Nosotros</a>
+      <a href="https://maps.app.goo.gl/Ufk9RH8gDcRQ3Ggm9" target="_blank" rel="noopener">Ubicación <span class="arrow">→</span></a>
+    </div>
+    <div class="nav-bottom">
+      <p class="nav-location">Barbaquillo, Manta</p>
+      <a href="https://www.instagram.com/perse.beach/" target="_blank" rel="noopener" class="nav-ig">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.4">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+        </svg>
+        @perse.beach
+      </a>
+    </div>
+  </nav>
+
+  <!-- ── Menu bar ─────────────────────────────────────── -->
+  <div id="menu-bar">
+    <div class="cat-scroll">
+      <button class="cat-jump active" data-target="entradas">
+        <span class="es-t">Entradas</span><span class="en-t" style="display:none">Starters</span>
+      </button>
+      <button class="cat-jump" data-target="ceviches">Ceviches</button>
+      <button class="cat-jump" data-target="manabi">Manabí</button>
+      <button class="cat-jump" data-target="fondos">
+        <span class="es-t">Fondos</span><span class="en-t" style="display:none">Mains</span>
+      </button>
+      <button class="cat-jump" data-target="crudos">
+        <span class="es-t">Crudos</span><span class="en-t" style="display:none">Raw</span>
+      </button>
+      <button class="cat-jump" data-target="cortes">
+        <span class="es-t">Cortes</span><span class="en-t" style="display:none">Cuts</span>
+      </button>
+      <button class="cat-jump" data-target="chef">
+        <span class="es-t">Del Chef</span><span class="en-t" style="display:none">From the Chef</span>
+      </button>
+      <button class="cat-jump" data-target="bebidas">
+        <span class="es-t">Bebidas</span><span class="en-t" style="display:none">Drinks</span>
+      </button>
+      <button class="cat-jump" data-target="pizzas">Pizzas</button>
+    </div>
+    <div class="lang-toggle">
+      <button class="lang-btn active" data-lang="es">ES</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+  </div>
+
+  <main>
+
+    <!-- ════════════════ ENTRADAS ════════════════ -->
+    <section class="menu-section" id="entradas">
+      <div class="section-head">
+        <p class="section-eyebrow es-t">Entradas</p>
+        <p class="section-eyebrow en-t" style="display:none">Starters</p>
+        <h2 class="section-name es-t">Entradas</h2>
+        <h2 class="section-name en-t" style="display:none">Starters</h2>
+        <p class="section-sub es-t">Salen rápido y abren el apetito</p>
+        <p class="section-sub en-t" style="display:none">Fast out of the kitchen and straight to your appetite</p>
+      </div>
+      <div class="items">
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Tiradito de Atún Trufado</p>
+            <p class="item-name es-t item-name-en en-t" style="display:none">Truffle-Glazed Tuna Tiradito</p>
+            <p class="item-desc es-t">Finas láminas de atún de Galápagos bañadas en salsa cremosa trufada con albahaca aromática.</p>
+            <p class="item-desc en-t" style="display:none">Thin slices of Galápagos tuna glazed in creamy truffle sauce with aromatic basil.</p>
+          </div>
+          <span class="item-price">$12,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Tiradito Crucita</p>
+            <p class="item-name en-t" style="display:none">Crucita Tiradito</p>
+            <p class="item-desc es-t">Finas láminas de pesca del día, leche de tigre cremosa ahumada, aguacate, cebolla, mayomaní, oliva &amp; baguette.</p>
+            <p class="item-desc en-t" style="display:none">Thin slices of catch of the day, smoky creamy tiger's milk, avocado, onion, peanut mayo, olive &amp; baguette.</p>
+          </div>
+          <span class="item-price">$7,50</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Papas a la Huancaína</p>
+            <p class="item-name en-t" style="display:none">Huancaína Potatoes</p>
+            <p class="item-desc es-t">Papas salteadas en queso parmesano, camarón al josper, portobellos y salprieta.</p>
+            <p class="item-desc en-t" style="display:none">Sautéed potatoes with parmesan, josper-grilled shrimp, portobello mushrooms and salprieta.</p>
+          </div>
+          <span class="item-price">$6,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Calamares Crunch</p>
+            <p class="item-name en-t" style="display:none">Crunchy Calamari</p>
+            <p class="item-desc es-t">Calamar de Salango crujiente con maduro frito y queso manaba del puerto.</p>
+            <p class="item-desc en-t" style="display:none">Crispy Salango squid with fried sweet plantain and local port cheese.</p>
+          </div>
+          <span class="item-price">$10,50</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Pulpo al Olivo</p>
+            <p class="item-name en-t" style="display:none">Octopus with Olive Sauce</p>
+            <p class="item-desc es-t">Láminas de pulpo de Puerto López, salsa de olivo, aguacate y crujiente de nori.</p>
+            <p class="item-desc en-t" style="display:none">Sliced Puerto López octopus, olive sauce, avocado and crispy nori.</p>
+          </div>
+          <span class="item-price">$9,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Atún Tartar</p>
+            <p class="item-name en-t" style="display:none">Tuna Tartare</p>
+            <p class="item-desc es-t">Atún fresco, salsa acevichada, mayo wasabi, togarashi y pan de masa madre.</p>
+            <p class="item-desc en-t" style="display:none">Fresh tuna, ceviche-style sauce, wasabi mayo, togarashi and sourdough.</p>
+          </div>
+          <span class="item-price">$9,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Carpaccio de Vaca Madurada</p>
+            <p class="item-name en-t" style="display:none">Aged Beef Carpaccio</p>
+            <p class="item-desc es-t">Láminas de nalga de vaca madurada, pesto, rúcula, olivo y pan de masa madre.</p>
+            <p class="item-desc en-t" style="display:none">Sliced aged beef rump, pesto, arugula, olive and sourdough.</p>
+          </div>
+          <span class="item-price">$18,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Mollejas de Ternera</p>
+            <p class="item-name en-t" style="display:none">Golden Veal Sweetbreads</p>
+            <p class="item-desc es-t">Mollejas de ternera doradas en mantequilla marrón y pan de masa madre.</p>
+            <p class="item-desc en-t" style="display:none">Veal sweetbreads golden-fried in brown butter with sourdough.</p>
+          </div>
+          <span class="item-price">$10,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Alitas</p>
+            <p class="item-name en-t" style="display:none">Wings</p>
+            <p class="item-desc es-t">Acevichadas · Al limón · BBQ</p>
+            <p class="item-desc en-t" style="display:none">Ceviche-style · Lemon · BBQ</p>
+          </div>
+          <span class="item-price">$9,50</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Baos de Cerdo</p>
+            <p class="item-name en-t" style="display:none">Pork Bao Buns</p>
+            <p class="item-desc es-t">Tres esponjosos panes al vapor rellenos de cerdo cocido 48 hrs con sarza criolla.</p>
+            <p class="item-desc en-t" style="display:none">Three fluffy steamed buns filled with 48-hour slow-cooked pork and criolla salsa.</p>
+          </div>
+          <span class="item-price">$9,00</span>
+        </div>
+
+      </div>
+      <p class="vat-note es-t">Precios no incluyen IVA 15%</p>
+      <p class="vat-note en-t" style="display:none">Prices do not include 15% VAT</p>
+    </section>
+
+    <!-- ════════════════ CEVICHES ════════════════ -->
+    <section class="menu-section" id="ceviches">
+      <div class="section-head">
+        <p class="section-eyebrow">Ceviches</p>
+        <h2 class="section-name">Ceviches</h2>
+        <p class="section-sub es-t">Reconfortarán tu alma en cada bocado — Elige el nivel de picante</p>
+        <p class="section-sub en-t" style="display:none">They'll comfort your soul with every bite — Choose your spice level</p>
+      </div>
+      <div class="items">
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name">Capital</p>
+            <p class="item-desc es-t">Pesca fresca con leche de tigre de maní tostado, aguacate cremoso y crocante manaba de chifles y maní.</p>
+            <p class="item-desc en-t" style="display:none">Fresh catch with toasted peanut tiger's milk, creamy avocado and crispy manaba chifles and peanuts.</p>
+          </div>
+          <span class="item-price">$8,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name">305</p>
+            <p class="item-desc es-t">Pesca curtida en leche de tigre con aguacate, cebollín y una cremosa mayo maní.</p>
+            <p class="item-desc en-t" style="display:none">Marinated catch in tiger's milk with avocado, scallion and creamy peanut mayo.</p>
+          </div>
+          <span class="item-price">$8,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Del Puerto</p>
+            <p class="item-name en-t" style="display:none">From the Port</p>
+            <p class="item-desc es-t">Pesca fresca del día, camarones parrilleros, pulpo, calamares crocantes, rosa de aguacate y leche de tigre cremosa.</p>
+            <p class="item-desc en-t" style="display:none">Day's fresh catch, grilled shrimp, octopus, crispy squid, avocado rose and creamy tiger's milk.</p>
+          </div>
+          <span class="item-price">$11,50</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Camarón</p>
+            <p class="item-name en-t" style="display:none">Shrimp</p>
+            <p class="item-desc es-t">Camarones frescos con leche de tigre blanca cremosa y criolla: cebolla, tomate y cilantro.</p>
+            <p class="item-desc en-t" style="display:none">Fresh shrimp with creamy white tiger's milk and criolla: onion, tomato and cilantro.</p>
+          </div>
+          <span class="item-price">$10,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Atún de Galápagos</p>
+            <p class="item-name en-t" style="display:none">Galápagos Tuna</p>
+            <p class="item-desc es-t">Aleta amarilla servida con leche de tigre de rocoto ahumado, aguacate y maíz tostado.</p>
+            <p class="item-desc en-t" style="display:none">Yellowfin tuna with smoked rocoto tiger's milk, avocado and toasted corn.</p>
+          </div>
+          <span class="item-price">$11,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Clásico Peruano</p>
+            <p class="item-name en-t" style="display:none">Peruvian Classic</p>
+            <p class="item-desc es-t">Pesca fresca del día en leche de tigre tradicional, acompañado de maíz tostado, choclo serrano y camote glaseado.</p>
+            <p class="item-desc en-t" style="display:none">Day's fresh catch in traditional tiger's milk, with toasted corn, highland choclo and glazed sweet potato.</p>
+          </div>
+          <span class="item-price">$9,50</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name">Carretillero</p>
+            <p class="item-desc es-t">Pesca fresca del día, camarones cocidos en leche de tigre caliente, calamares crocantes y leche de tigre de rocoto asado.</p>
+            <p class="item-desc en-t" style="display:none">Fresh catch, shrimp cooked in hot tiger's milk, crispy squid and roasted rocoto tiger's milk.</p>
+          </div>
+          <span class="item-price">$12,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Clásico Ecuatoriano</p>
+            <p class="item-name en-t" style="display:none">Ecuadorian Classic</p>
+            <p class="item-desc es-t">Pesca fresca del día en leche de tigre blanca cremosa con rosa de aguacate.</p>
+            <p class="item-desc en-t" style="display:none">Day's fresh catch in creamy white tiger's milk with avocado rose.</p>
+          </div>
+          <span class="item-price">$8,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Clásico Mixto</p>
+            <p class="item-name en-t" style="display:none">Classic Mixed</p>
+            <p class="item-desc es-t">Pesca fresca del día con leche de tigre blanca cremosa, camarones al josper, pulpo laminado y rosa de aguacate.</p>
+            <p class="item-desc en-t" style="display:none">Day's fresh catch with creamy white tiger's milk, josper shrimp, sliced octopus and avocado rose.</p>
+          </div>
+          <span class="item-price">$11,50</span>
+        </div>
+
+      </div>
+      <p class="vat-note es-t">Precios no incluyen IVA 15%</p>
+      <p class="vat-note en-t" style="display:none">Prices do not include 15% VAT</p>
+    </section>
+
+    <!-- ════════════════ MANABÍ ════════════════ -->
+    <section class="menu-section" id="manabi">
+      <div class="section-head">
+        <p class="section-eyebrow">Manabí</p>
+        <h2 class="section-name">Manabí</h2>
+        <p class="section-sub es-t">De donde venimos y hacia donde vamos</p>
+        <p class="section-sub en-t" style="display:none">Where we come from and where we're going</p>
+      </div>
+      <div class="items">
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Encocado Pesca del Día</p>
+            <p class="item-name en-t" style="display:none">Coconut Catch of the Day</p>
+            <p class="item-desc es-t">Pesca fresca en un encocado cremoso acompañada de camarones y arroz del campo.</p>
+            <p class="item-desc en-t" style="display:none">Fresh catch in a creamy coconut stew with shrimp and country rice.</p>
+          </div>
+          <span class="item-price">$14,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Atún en Salsa de Maní</p>
+            <p class="item-name en-t" style="display:none">Tuna in Peanut Sauce</p>
+            <p class="item-desc es-t">Atún Yellow Fin sellado al josper, en salsa de maní tostado, sarza criolla y patacones.</p>
+            <p class="item-desc en-t" style="display:none">Josper-seared yellowfin tuna in toasted peanut sauce, criolla salsa and plantains.</p>
+          </div>
+          <span class="item-price">$10,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Sudado de Pescado</p>
+            <p class="item-name en-t" style="display:none">Fish Sudado</p>
+            <p class="item-desc es-t">Pesca fresca premium cocida con yuca cremosa, vegetales ahumados y arroz blanco.</p>
+            <p class="item-desc en-t" style="display:none">Premium fresh catch cooked with creamy yuca, smoked vegetables and white rice.</p>
+          </div>
+          <span class="item-price">$12,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Pesca Entera</p>
+            <p class="item-name en-t" style="display:none">Whole Grilled Fish</p>
+            <p class="item-desc es-t">Pesca entera a la robata —parrilla japonesa de carbón—, con piel dorada y ahumado suave. Acompañada de patacones y sarza criolla fresca.</p>
+            <p class="item-desc en-t" style="display:none">Whole fish on the robata —Japanese charcoal grill—, golden skin with subtle smoke. Served with plantains and fresh criolla salsa.</p>
+          </div>
+          <span class="item-price">$15,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Chicharrón de Camotillo</p>
+            <p class="item-name en-t" style="display:none">Crispy Camotillo</p>
+            <p class="item-desc es-t">Camotillo apanado y frito crujiente, con yuca arrebosada, mayonesa de rocoto ahumado y sarza criolla.</p>
+            <p class="item-desc en-t" style="display:none">Breaded and crispy-fried camotillo fish with battered yuca, smoked rocoto mayo and criolla salsa.</p>
+          </div>
+          <span class="item-price">$12,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Robalo al Ají</p>
+            <p class="item-name en-t" style="display:none">Chili Sea Bass</p>
+            <p class="item-desc es-t">Róbalo al carbón, bañado en salsa cremosa de ají, con camarones y verduras salteadas.</p>
+            <p class="item-desc en-t" style="display:none">Charcoal sea bass in creamy chili sauce with shrimp and sautéed vegetables.</p>
+          </div>
+          <span class="item-price">$12,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Fettuccine del Mar</p>
+            <p class="item-name en-t" style="display:none">Seafood Fettuccine</p>
+            <p class="item-desc es-t">Fettuccini en sofrito manaba de salprieta y maní quebrado, con un mix de mariscos al carbón.</p>
+            <p class="item-desc en-t" style="display:none">Fettuccine in manaba salprieta and crushed peanut sofrito with a charcoal-grilled seafood mix.</p>
+          </div>
+          <span class="item-price">$12,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Arroz con Conchas</p>
+            <p class="item-name en-t" style="display:none">Rice with Clams</p>
+            <p class="item-desc es-t">Conchas del Golfo de Guayaquil, sofrito de la casa, toque de vinagre de guineo y arroz cremoso en su punto.</p>
+            <p class="item-desc en-t" style="display:none">Gulf of Guayaquil clams, house sofrito, a hint of banana vinegar and perfectly creamy rice.</p>
+          </div>
+          <span class="item-price">$14,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Cazuela Mixta</p>
+            <p class="item-name en-t" style="display:none">Mixed Cazuela</p>
+            <p class="item-desc es-t">Cazuela con base de verde y maní, refrito criollo de la casa, atún de Galápagos siempre fresco junto patacones crujientes.</p>
+            <p class="item-desc en-t" style="display:none">Green plantain and peanut cazuela, house criolla sofrito, always-fresh Galápagos tuna with crispy plantains.</p>
+          </div>
+          <span class="item-price">$10,50</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Pollo Deshuesado</p>
+            <p class="item-name en-t" style="display:none">Josper Chicken</p>
+            <p class="item-desc es-t">Muslos de pollo deshuesados, cocinados al josper con ahumado concentrado y piel dorada al punto, acompañados de puré sedoso y arroz del campo.</p>
+            <p class="item-desc en-t" style="display:none">Boneless chicken thighs josper-cooked with deep smoke and perfectly golden skin, served with silky mash and country rice.</p>
+          </div>
+          <span class="item-price">$11,50</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Arroz Frito &amp; Longaniza</p>
+            <p class="item-name en-t" style="display:none">Fried Rice &amp; Sausage</p>
+            <p class="item-desc es-t">El clásico arroz con longaniza, pero frito: más intenso, más crujiente. Con longaniza artesanal de Río Chico y maduro frito bien dorado.</p>
+            <p class="item-desc en-t" style="display:none">The classic rice and sausage, but fried: more intense, crispier. With artisan Río Chico sausage and well-golden fried sweet plantain.</p>
+          </div>
+          <span class="item-price">$13,00</span>
+        </div>
+
+      </div>
+      <p class="vat-note es-t">Precios no incluyen IVA 15%</p>
+      <p class="vat-note en-t" style="display:none">Prices do not include 15% VAT</p>
+    </section>
+
+    <!-- ════════════════ FONDOS ════════════════ -->
+    <section class="menu-section" id="fondos">
+      <div class="section-head">
+        <p class="section-eyebrow es-t">Fondos</p>
+        <p class="section-eyebrow en-t" style="display:none">Mains</p>
+        <h2 class="section-name es-t">Fondos</h2>
+        <h2 class="section-name en-t" style="display:none">Mains</h2>
+        <p class="section-sub es-t">No necesitan introducción: son los best sellers de la casa</p>
+        <p class="section-sub en-t" style="display:none">No introduction needed: the house's best sellers</p>
+      </div>
+      <div class="items">
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Arroz del Chef</p>
+            <p class="item-name en-t" style="display:none">Chef's Rice</p>
+            <p class="item-desc es-t">Arroz cremoso con sabor intenso a mariscos, pulpo, langostinos frescos, calamares salteados al wok con chalaquita tradicional.</p>
+            <p class="item-desc en-t" style="display:none">Creamy rice with intense seafood flavor, octopus, fresh prawns, wok-sautéed squid and traditional chalaquita.</p>
+          </div>
+          <span class="item-price">$14,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Arroz con Camarones</p>
+            <p class="item-name en-t" style="display:none">Shrimp Rice</p>
+            <p class="item-desc es-t">Arroz cremoso al josper con langostinos a la mantequilla de limón, aguacate y mayo wasabi &amp; mayo maní.</p>
+            <p class="item-desc en-t" style="display:none">Josper creamy rice with lemon butter prawns, avocado, wasabi mayo &amp; peanut mayo.</p>
+          </div>
+          <span class="item-price">$14,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Arroz Tortilla</p>
+            <p class="item-name en-t" style="display:none">Rice Tortilla</p>
+            <p class="item-desc es-t">Arroz frito salteado con pulpo tierno y calamar fresco, servido con una tortilla de camarones en su punto.</p>
+            <p class="item-desc en-t" style="display:none">Stir-fried rice with tender octopus and fresh squid, served with a perfectly cooked shrimp tortilla.</p>
+          </div>
+          <span class="item-price">$12,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Pez Coco</p>
+            <p class="item-name en-t" style="display:none">Coco Fish</p>
+            <p class="item-desc es-t">Arroz cremoso de coco y curry aromático, pesca crocante del día con salsa de cangrejo cremosa al maní y sarza criolla.</p>
+            <p class="item-desc en-t" style="display:none">Aromatic coconut curry creamy rice, crispy day's catch with creamy peanut crab sauce and criolla salsa.</p>
+          </div>
+          <span class="item-price">$15,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Gran Pesca</p>
+            <p class="item-name en-t" style="display:none">Grand Catch</p>
+            <p class="item-desc es-t">Pesca del día a la plancha, camarones parrilleros ahumados con arroz costeño y pulpo asado.</p>
+            <p class="item-desc en-t" style="display:none">Grilled day's catch, smoky grilled shrimp with coastal rice and roasted octopus.</p>
+          </div>
+          <span class="item-price">$13,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Pulpo a la Parrilla</p>
+            <p class="item-name en-t" style="display:none">Grilled Octopus</p>
+            <p class="item-desc es-t">Pulpo suave ahumado con gusto parrillero intenso, arroz del campo, papas salteadas, champiñones y mayonesa de maní.</p>
+            <p class="item-desc en-t" style="display:none">Tender smoked octopus with intense grill flavor, country rice, sautéed potatoes, mushrooms and peanut mayo.</p>
+          </div>
+          <span class="item-price">$15,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Arroz con Cerdo</p>
+            <p class="item-name en-t" style="display:none">Pork Rice</p>
+            <p class="item-desc es-t">Panceta crocante sobre arroz verde con choclo dulce y zanahoria, sarza criolla tradicional y hierbabuena.</p>
+            <p class="item-desc en-t" style="display:none">Crispy pork belly over green rice with sweet corn and carrot, traditional criolla salsa and mint.</p>
+          </div>
+          <span class="item-price">$14,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Chicharrón de Cerdo</p>
+            <p class="item-name en-t" style="display:none">Crispy Pork Belly</p>
+            <p class="item-desc es-t">Panceta crocante servida con guacamole manaba cremoso, salprieta y queso manaba semiduro.</p>
+            <p class="item-desc en-t" style="display:none">Crispy pork belly with creamy manaba guacamole, salprieta and semi-hard manaba cheese.</p>
+          </div>
+          <span class="item-price">$15,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Lomo Salteado</p>
+            <p class="item-name en-t" style="display:none">Stir-Fried Tenderloin</p>
+            <p class="item-desc es-t">Lomo fino salteado al wok con verduras crujientes: cebolla, tomate fresco y papas fritas.</p>
+            <p class="item-desc en-t" style="display:none">Wok-stir-fried tenderloin with crispy vegetables: onion, fresh tomato and fries.</p>
+          </div>
+          <span class="item-price">$15,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Pasta Pesto &amp; Pollo</p>
+            <p class="item-name en-t" style="display:none">Pesto Pasta &amp; Chicken</p>
+            <p class="item-desc es-t">Pasta fresca con pesto de albahaca casero y pechuga de pollo a la plancha.</p>
+            <p class="item-desc en-t" style="display:none">Fresh pasta with house basil pesto and grilled chicken breast.</p>
+          </div>
+          <span class="item-price">$14,00</span>
+        </div>
+
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Lomo &amp; Pasta Huancaína</p>
+            <p class="item-name en-t" style="display:none">Tenderloin &amp; Huancaína Pasta</p>
+            <p class="item-desc es-t">Pappardelle en salsa de ají amarillo y curry con lomo grillado en salsa especial perse.</p>
+            <p class="item-desc en-t" style="display:none">Pappardelle in yellow chili and curry sauce with grilled tenderloin in ṗerSe's special sauce.</p>
+          </div>
+          <span class="item-price">$15,00</span>
+        </div>
+
+      </div>
+      <p class="vat-note es-t">Precios no incluyen IVA 15%</p>
+      <p class="vat-note en-t" style="display:none">Prices do not include 15% VAT</p>
+    </section>
+
+    <!-- ════════════════ CRUDOS ════════════════ -->
+    <section class="menu-section" id="crudos">
+      <div class="section-head">
+        <p class="section-eyebrow es-t">Crudos</p>
+        <p class="section-eyebrow en-t" style="display:none">Raw</p>
+        <h2 class="section-name es-t">Crudos</h2>
+        <h2 class="section-name en-t" style="display:none">Raw</h2>
+        <p class="section-sub es-t">Frescura, dedicación y clase en un plato</p>
+        <p class="section-sub en-t" style="display:none">Freshness, dedication and class on a plate</p>
+      </div>
+
+      <div class="sub-section">
+        <p class="sub-section-name es-t">Rollos</p>
+        <p class="sub-section-name en-t" style="display:none">Rolls</p>
+        <div class="items">
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name es-t">Acevichado</p>
+              <p class="item-name en-t" style="display:none">Ceviche Roll</p>
+              <p class="item-desc es-t">Aguacate, camarón, atún, salsa acevichada y crocantes de papa.</p>
+              <p class="item-desc en-t" style="display:none">Avocado, shrimp, tuna, ceviche sauce and crispy potato.</p>
+            </div>
+            <span class="item-price">$10,00</span>
+          </div>
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name">Parrillero</p>
+              <p class="item-desc es-t">Aguacate, camarón apanado, entraña, queso crema y chimichurri.</p>
+              <p class="item-desc en-t" style="display:none">Avocado, breaded shrimp, skirt steak, cream cheese and chimichurri.</p>
+            </div>
+            <span class="item-price">$11,50</span>
+          </div>
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name es-t">Atardecer Olón</p>
+              <p class="item-name en-t" style="display:none">Olón Sunset</p>
+              <p class="item-desc es-t">Aguacate, camarón apanado, salmón, salsa especial y taré.</p>
+              <p class="item-desc en-t" style="display:none">Avocado, breaded shrimp, salmon, special sauce and tare.</p>
+            </div>
+            <span class="item-price">$10,00</span>
+          </div>
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name">Tempura</p>
+              <p class="item-desc es-t">Aguacate, camarón, queso crema, crocante de salmón y salsa taré.</p>
+              <p class="item-desc en-t" style="display:none">Avocado, shrimp, cream cheese, crispy salmon and tare sauce.</p>
+            </div>
+            <span class="item-price">$10,00</span>
+          </div>
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name">Furai</p>
+              <p class="item-desc es-t">Aguacate, queso crema, salmón frito al panko con salsa taré.</p>
+              <p class="item-desc en-t" style="display:none">Avocado, cream cheese, panko-fried salmon with tare sauce.</p>
+            </div>
+            <span class="item-price">$10,00</span>
+          </div>
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name es-t">Tabla de Nigiris</p>
+              <p class="item-name en-t" style="display:none">Nigiri Board</p>
+              <p class="item-desc es-t">Experiencia 4 bocados: Entraña · Mar y tierra · Atún trufado · Pesca blanca · Sir crab.</p>
+              <p class="item-desc en-t" style="display:none">4-bite experience: Skirt steak · Land &amp; sea · Truffle tuna · White fish · Sir crab.</p>
+            </div>
+            <span class="item-price">$10,25</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <p class="sub-section-name">Bowls</p>
+        <div class="items">
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name">Poké OG</p>
+              <p class="item-desc es-t">Atún de Galápagos, teriyaki con ajonjolí, salmón spicy mayo, piña dulce, aguacate cremoso, camote frito y zanahoria crocante.</p>
+              <p class="item-desc en-t" style="display:none">Galápagos tuna, sesame teriyaki, spicy mayo salmon, sweet pineapple, creamy avocado, fried sweet potato and crispy carrot.</p>
+            </div>
+            <span class="item-price">$12,00</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="vat-note es-t">Precios no incluyen IVA 15%</p>
+      <p class="vat-note en-t" style="display:none">Prices do not include 15% VAT</p>
+    </section>
+
+    <!-- ════════════════ CORTES ════════════════ -->
+    <section class="menu-section" id="cortes">
+      <div class="section-head">
+        <p class="section-eyebrow es-t">Cortes</p>
+        <p class="section-eyebrow en-t" style="display:none">Cuts</p>
+        <h2 class="section-name es-t">Cortes</h2>
+        <h2 class="section-name en-t" style="display:none">Cuts</h2>
+        <p class="section-sub es-t">Asados al josper, técnica milenaria — Elige el término de cocción</p>
+        <p class="section-sub en-t" style="display:none">Josper-grilled, ancient technique — Choose your doneness</p>
+      </div>
+      <div class="items">
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name">Ribeye Angus USDA Prime <span style="font-weight:400;font-size:0.85em">300 gr. 🇺🇸</span></p>
+          </div>
+          <span class="item-price">$38,50</span>
+        </div>
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name">New York Strip Angus USDA Prime <span style="font-weight:400;font-size:0.85em">300 gr. 🇺🇸</span></p>
+          </div>
+          <span class="item-price">$26,00</span>
+        </div>
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Entraña Angus USDA Prime <span style="font-weight:400;font-size:0.85em">300 gr. 🇺🇸</span></p>
+            <p class="item-name en-t" style="display:none">Skirt Steak Angus USDA Prime <span style="font-weight:400;font-size:0.85em">300 gr. 🇺🇸</span></p>
+          </div>
+          <span class="item-price">$32,00</span>
+        </div>
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name">Picaña Angus USDA Prime <span style="font-weight:400;font-size:0.85em">300 gr. 🇺🇸</span></p>
+          </div>
+          <span class="item-price">$25,50</span>
+        </div>
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Ribeye Nacional <span style="font-weight:400;font-size:0.85em">300 gr. 🇪🇨</span></p>
+            <p class="item-name en-t" style="display:none">Local Ribeye <span style="font-weight:400;font-size:0.85em">300 gr. 🇪🇨</span></p>
+          </div>
+          <span class="item-price">$22,00</span>
+        </div>
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Costillas Cerdo de altura <span style="font-weight:400;font-size:0.85em">(4320 msnm) 🇪🇨</span></p>
+            <p class="item-name en-t" style="display:none">High-Altitude Pork Ribs <span style="font-weight:400;font-size:0.85em">(4320 m) 🇪🇨</span></p>
+          </div>
+          <span class="item-price">$15,00</span>
+        </div>
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Matambre Ahumado, tierno y jugoso 🇪🇨</p>
+            <p class="item-name en-t" style="display:none">Smoked Matambre, tender &amp; juicy 🇪🇨</p>
+          </div>
+          <span class="item-price">$15,00</span>
+        </div>
+        <div class="item">
+          <div class="item-body">
+            <p class="item-name es-t">Pechuga de Pollo al josper <span style="font-weight:400;font-size:0.85em">250 g 🇪🇨</span></p>
+            <p class="item-name en-t" style="display:none">Josper Chicken Breast <span style="font-weight:400;font-size:0.85em">250 g 🇪🇨</span></p>
+          </div>
+          <span class="item-price">$11,00</span>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <p class="sub-section-name es-t">Guarniciones</p>
+        <p class="sub-section-name en-t" style="display:none">Sides</p>
+        <div class="items sides-grid">
+          <div class="item"><div class="item-body"><p class="item-name es-t">Patacones al ajillo</p><p class="item-name en-t" style="display:none">Garlic plantains</p></div><span class="item-price">$3,00</span></div>
+          <div class="item"><div class="item-body"><p class="item-name es-t">Arroz del campo</p><p class="item-name en-t" style="display:none">Country rice</p></div><span class="item-price">$4,00</span></div>
+          <div class="item"><div class="item-body"><p class="item-name es-t">Arroz con tocino</p><p class="item-name en-t" style="display:none">Bacon rice</p></div><span class="item-price">$4,00</span></div>
+          <div class="item"><div class="item-body"><p class="item-name es-t">Moro de la casa</p><p class="item-name en-t" style="display:none">House moro</p></div><span class="item-price">$4,00</span></div>
+          <div class="item"><div class="item-body"><p class="item-name es-t">Pasta al pesto</p><p class="item-name en-t" style="display:none">Pesto pasta</p></div><span class="item-price">$7,00</span></div>
+          <div class="item"><div class="item-body"><p class="item-name es-t">Ensalada fresca</p><p class="item-name en-t" style="display:none">Fresh salad</p></div><span class="item-price">$4,00</span></div>
+          <div class="item"><div class="item-body"><p class="item-name es-t">Maduro asado</p><p class="item-name en-t" style="display:none">Roasted sweet plantain</p></div><span class="item-price">$4,00</span></div>
+          <div class="item"><div class="item-body"><p class="item-name es-t">Chorizo finas hierbas</p><p class="item-name en-t" style="display:none">Fine herb chorizo</p></div><span class="item-price">$3,50</span></div>
+          <div class="item"><div class="item-body"><p class="item-name es-t">Papas doradas trufadas</p><p class="item-name en-t" style="display:none">Truffle golden potatoes</p></div><span class="item-price">$5,00</span></div>
+          <div class="item"><div class="item-body"><p class="item-name es-t">Papas fritas</p><p class="item-name en-t" style="display:none">French fries</p></div><span class="item-price">$3,00</span></div>
+          <div class="item"><div class="item-body"><p class="item-name es-t">Vegetales a la parrilla</p><p class="item-name en-t" style="display:none">Grilled vegetables</p></div><span class="item-price">$4,00</span></div>
+        </div>
+      </div>
+      <p class="vat-note es-t">Precios no incluyen IVA 15%</p>
+      <p class="vat-note en-t" style="display:none">Prices do not include 15% VAT</p>
+    </section>
+
+    <!-- ════════════════ DEL CHEF ════════════════ -->
+    <section class="menu-section" id="chef">
+      <div class="section-head">
+        <p class="section-eyebrow es-t">Del Chef</p>
+        <p class="section-eyebrow en-t" style="display:none">From the Chef</p>
+        <h2 class="section-name es-t">Del Chef</h2>
+        <h2 class="section-name en-t" style="display:none">From the Chef</h2>
+        <p class="section-sub es-t">Creaciones del chef que saben bien</p>
+        <p class="section-sub en-t" style="display:none">Chef's creations that just taste right</p>
+      </div>
+
+      <div class="sub-section">
+        <p class="sub-section-name es-t">The Best Fkn' Sandwiches</p>
+        <p class="sub-section-name en-t" style="display:none">The Best Fkn' Sandwiches</p>
+        <div class="items">
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name es-t">Hamburguesa</p>
+              <p class="item-name en-t" style="display:none">Burger</p>
+              <p class="item-desc es-t">Carne Angus USDA Prime, queso cheddar, tocino ahumado, cebolla caramelizada, salsa especial &amp; papas fritas.</p>
+              <p class="item-desc en-t" style="display:none">USDA Prime Angus beef, cheddar cheese, smoked bacon, caramelized onion, special sauce &amp; fries.</p>
+            </div>
+            <span class="item-price">$10,00</span>
+          </div>
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name es-t">Sandwich de Entraña</p>
+              <p class="item-name en-t" style="display:none">Skirt Steak Sandwich</p>
+              <p class="item-desc es-t">Entraña Angus USDA Prime, queso edam cremoso, chimichurri, pan de masa madre tostado.</p>
+              <p class="item-desc en-t" style="display:none">USDA Prime Angus skirt steak, creamy edam cheese, chimichurri, toasted sourdough.</p>
+            </div>
+            <span class="item-price">$19,00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <p class="sub-section-name es-t">Ensaladas</p>
+        <p class="sub-section-name en-t" style="display:none">Salads</p>
+        <div class="items">
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name es-t">Ensalada Burrata</p>
+              <p class="item-name en-t" style="display:none">Burrata Salad</p>
+              <p class="item-desc es-t">Burrata cremosa sobre lecho de hojas verdes, tomates cherrys confitados, piña confitada, jamón serrano, higos secos.</p>
+              <p class="item-desc en-t" style="display:none">Creamy burrata on a bed of greens, candied cherry tomatoes, candied pineapple, serrano ham, dried figs.</p>
+            </div>
+            <span class="item-price">$9,50</span>
+          </div>
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name es-t">Ensalada César</p>
+              <p class="item-name en-t" style="display:none">Caesar Salad</p>
+              <p class="item-desc es-t">Receta tradicional con lechuga romana, salsa cesar, pechuga de pollo al josper, tocino manaba.</p>
+              <p class="item-desc en-t" style="display:none">Traditional recipe with romaine lettuce, caesar dressing, josper chicken breast, manaba bacon.</p>
+            </div>
+            <span class="item-price">$9,50</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <p class="sub-section-name">Kids</p>
+        <div class="items">
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name es-t">Pescado al Panko</p>
+              <p class="item-name en-t" style="display:none">Panko Fish</p>
+              <p class="item-desc es-t">Trocitos de pesca fresca con arroz y sarza criolla.</p>
+              <p class="item-desc en-t" style="display:none">Fresh fish pieces with rice and criolla salsa.</p>
+            </div>
+            <span class="item-price">$8,00</span>
+          </div>
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name">Chicken Tenders</p>
+              <p class="item-desc es-t">Palitos de pechuga de pollo empanizados con papas fritas.</p>
+              <p class="item-desc en-t" style="display:none">Breaded chicken breast strips with fries.</p>
+            </div>
+            <span class="item-price">$8,00</span>
+          </div>
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name">Chicken Nuggets</p>
+              <p class="item-desc es-t">Chicken nuggets con papas fritas.</p>
+              <p class="item-desc en-t" style="display:none">Chicken nuggets with fries.</p>
+            </div>
+            <span class="item-price">$8,50</span>
+          </div>
+        </div>
+      </div>
+      <p class="vat-note es-t">Precios no incluyen IVA 15%</p>
+      <p class="vat-note en-t" style="display:none">Prices do not include 15% VAT</p>
+    </section>
+
+    <!-- ════════════════ BEBIDAS ════════════════ -->
+    <section class="menu-section" id="bebidas">
+      <div class="section-head">
+        <p class="section-eyebrow es-t">Bebidas</p>
+        <p class="section-eyebrow en-t" style="display:none">Drinks</p>
+        <h2 class="section-name es-t">Bebidas</h2>
+        <h2 class="section-name en-t" style="display:none">Drinks</h2>
+      </div>
+
+      <div class="sub-section">
+        <p class="sub-section-name es-t">Softs</p>
+        <p class="sub-section-name en-t" style="display:none">Softs</p>
+        <div class="items">
+          <div class="item"><div class="item-body"><p class="item-name es-t">Limonada de Hierbabuena</p><p class="item-name en-t" style="display:none">Mint Lemonade</p></div><span class="item-price">$3,00</span></div>
+          <div class="item"><div class="item-body"><p class="item-name es-t">Limonada Clásica</p><p class="item-name en-t" style="display:none">Classic Lemonade</p></div><span class="item-price">$3,00</span></div>
+          <div class="item"><div class="item-body"><p class="item-name es-t">Limonada Imperial</p><p class="item-name en-t" style="display:none">Imperial Lemonade</p></div><span class="item-price">$3,50</span></div>
+          <div class="item"><div class="item-body"><p class="item-name es-t">Limonada Frozen</p><p class="item-name en-t" style="display:none">Frozen Lemonade</p></div><span class="item-price">$3,50</span></div>
+          <div class="item"><div class="item-body"><p class="item-name es-t">Jugos de la Casa</p><p class="item-name en-t" style="display:none">House Juices</p></div><span class="item-price">$3,00</span></div>
+          <div class="item"><div class="item-body"><p class="item-name es-t">Jugos de la Casa Frozen</p><p class="item-name en-t" style="display:none">House Frozen Juices</p></div><span class="item-price">$3,50</span></div>
+          <div class="item"><div class="item-body"><p class="item-name es-t">Agua</p><p class="item-name en-t" style="display:none">Water</p></div><span class="item-price">$2,00</span></div>
+          <div class="item"><div class="item-body"><p class="item-name">Güitig</p></div><span class="item-price">$2,00</span></div>
+          <div class="item"><div class="item-body"><p class="item-name es-t">Gaseosas</p><p class="item-name en-t" style="display:none">Sodas</p></div><span class="item-price">$1,80</span></div>
+          <div class="item"><div class="item-body"><p class="item-name es-t">Chicha Morada</p><p class="item-name en-t" style="display:none">Chicha Morada</p></div><span class="item-price">$3,00</span></div>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <p class="sub-section-name es-t">Cervezas</p>
+        <p class="sub-section-name en-t" style="display:none">Beer</p>
+        <div class="items">
+          <div class="item"><div class="item-body"><p class="item-name">Heineken</p></div><span class="item-price">$4,00</span></div>
+          <div class="item"><div class="item-body"><p class="item-name">Club Premium</p></div><span class="item-price">$2,50</span></div>
+          <div class="item"><div class="item-body"><p class="item-name">Peroni</p></div><span class="item-price">$4,00</span></div>
+          <div class="item"><div class="item-body"><p class="item-name">Modelo</p></div><span class="item-price">$5,00</span></div>
+          <div class="item"><div class="item-body"><p class="item-name">Rock City Cider</p></div><span class="item-price">$4,50</span></div>
+          <div class="item"><div class="item-body"><p class="item-name">Corona</p></div><span class="item-price">$4,00</span></div>
+        </div>
+      </div>
+      <p class="vat-note es-t">Precios no incluyen IVA 15%</p>
+      <p class="vat-note en-t" style="display:none">Prices do not include 15% VAT</p>
+    </section>
+
+    <!-- ════════════════ PIZZAS ════════════════ -->
+    <section class="menu-section" id="pizzas">
+      <div class="section-head">
+        <p class="section-eyebrow">pizzas by p</p>
+        <h2 class="section-name">pizzas by p</h2>
+      </div>
+
+      <div class="sub-section">
+        <p class="sub-section-name es-t">Clásicas — Las que no necesitan explicación</p>
+        <p class="sub-section-name en-t" style="display:none">Classics — No explanation needed</p>
+        <div class="items">
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name">Margarita</p>
+              <p class="item-desc es-t">Pomodoro, mozzarella y albahaca.</p>
+              <p class="item-desc en-t" style="display:none">Pomodoro, mozzarella and basil.</p>
+            </div>
+            <span class="item-price">$9,50</span>
+          </div>
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name es-t">Jamón &amp; Queso</p>
+              <p class="item-name en-t" style="display:none">Ham &amp; Cheese</p>
+              <p class="item-desc es-t">Pomodoro, jamón &amp; mozzarella.</p>
+              <p class="item-desc en-t" style="display:none">Pomodoro, ham &amp; mozzarella.</p>
+            </div>
+            <span class="item-price">$9,50</span>
+          </div>
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name">New York</p>
+              <p class="item-desc es-t">Pomodoro, salame, mozzarella, jalapeños &amp; miel del chacal.</p>
+              <p class="item-desc en-t" style="display:none">Pomodoro, salami, mozzarella, jalapeños &amp; chacal honey.</p>
+            </div>
+            <span class="item-price">$13,00</span>
+          </div>
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name">Hawaianna</p>
+              <p class="item-desc es-t">Pomodoro, chicharrón, piña asada, mozzarella &amp; pecorino.</p>
+              <p class="item-desc en-t" style="display:none">Pomodoro, pork crackling, roasted pineapple, mozzarella &amp; pecorino.</p>
+            </div>
+            <span class="item-price">$12,00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <p class="sub-section-name es-t">Signature — No las encontrarás en ningún otro lugar</p>
+        <p class="sub-section-name en-t" style="display:none">Signature — You won't find these anywhere else</p>
+        <div class="items">
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name">Chistorra</p>
+              <p class="item-desc es-t">Chistorra, salsa de pimientos asados, grana padano &amp; stracciatella.</p>
+              <p class="item-desc en-t" style="display:none">Chistorra sausage, roasted pepper sauce, grana padano &amp; stracciatella.</p>
+            </div>
+            <span class="item-price">$12,50</span>
+          </div>
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name es-t">Hongos &amp; Pesto</p>
+              <p class="item-name en-t" style="display:none">Mushroom &amp; Pesto</p>
+              <p class="item-desc es-t">Base blanca de portobellos y champiñones, pecorino romano &amp; pesto.</p>
+              <p class="item-desc en-t" style="display:none">White base with portobello and mushrooms, pecorino romano &amp; pesto.</p>
+            </div>
+            <span class="item-price">$13,00</span>
+          </div>
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name">Mortaza</p>
+              <p class="item-desc es-t">Pomodoro, mortadella de pistachos, burrata &amp; mozzarella.</p>
+              <p class="item-desc en-t" style="display:none">Pomodoro, pistachio mortadella, burrata &amp; mozzarella.</p>
+            </div>
+            <span class="item-price">$18,00</span>
+          </div>
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name">Prosciutto</p>
+              <p class="item-desc es-t">Pomodoro, prosciutto, mozzarella, rúcula &amp; stracciatella.</p>
+              <p class="item-desc en-t" style="display:none">Pomodoro, prosciutto, mozzarella, arugula &amp; stracciatella.</p>
+            </div>
+            <span class="item-price">$13,00</span>
+          </div>
+          <div class="item">
+            <div class="item-body">
+              <p class="item-name">Nutella</p>
+              <p class="item-desc es-t">Base de Nutella, frutilla en almíbar, guineo &amp; marshmallows.</p>
+              <p class="item-desc en-t" style="display:none">Nutella base, syrup strawberry, banana &amp; marshmallows.</p>
+            </div>
+            <span class="item-price">$11,00</span>
+          </div>
+        </div>
+      </div>
+      <p class="vat-note es-t">Precios no incluyen IVA 15%</p>
+      <p class="vat-note en-t" style="display:none">Prices do not include 15% VAT</p>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ──────────────────────────────────────── -->
+  <footer id="footer">
+    <hr class="footer-rule" />
+
+    <div class="footer-info">
+      <p>Dom &nbsp;11:00 - 16:00</p>
+      <p>Lun &nbsp;Cerrado</p>
+      <p>Mar - Jue &nbsp;11:00 - 23:00</p>
+      <p>Vie, Sáb &nbsp;12:00 - 00:00</p>
+      <p class="gap">
+        <a href="https://maps.app.goo.gl/Ufk9RH8gDcRQ3Ggm9" target="_blank" rel="noopener" style="color:inherit;">
+          Barbaquillo, Manta, Ecuador
+        </a>
+      </p>
+    </div>
+
+    <a href="https://www.instagram.com/perse.beach/" target="_blank" rel="noopener" class="footer-ig" aria-label="Instagram">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.3">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+        <circle cx="12" cy="12" r="4"/>
+        <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+      </svg>
+    </a>
+
+    <div class="footer-bottom">
+      <span class="footer-copy">&copy; 2025 ṗerSe</span>
+      <nav class="footer-nav">
+        <a href="index.html">Inicio</a>
+        <a href="menu.html">Menú</a>
+        <a href="https://maps.app.goo.gl/Ufk9RH8gDcRQ3Ggm9" target="_blank" rel="noopener">Ubicación</a>
+        <a href="https://www.instagram.com/perse.beach/" target="_blank" rel="noopener">Instagram</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    /* ── Nav drawer ── */
+    const burger     = document.getElementById('burger');
+    const backdrop   = document.getElementById('nav-backdrop');
+    const navOverlay = document.getElementById('nav-overlay');
+    const navClose   = document.getElementById('nav-close');
+
+    function openNav()  { navOverlay.classList.add('open'); backdrop.classList.add('open'); document.body.style.overflow = 'hidden'; }
+    function closeNav() { navOverlay.classList.remove('open'); backdrop.classList.remove('open'); document.body.style.overflow = ''; }
+
+    burger.addEventListener('click', openNav);
+    navClose.addEventListener('click', closeNav);
+    backdrop.addEventListener('click', closeNav);
+    navOverlay.querySelectorAll('a').forEach(a => a.addEventListener('click', closeNav));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
+
+    /* ── Language toggle ── */
+    const langBtns = document.querySelectorAll('.lang-btn');
+    langBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const lang = btn.dataset.lang;
+        langBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Toggle descriptions, section labels, cat-jumps — but NOT item names
+        document.querySelectorAll('.es-t:not(.item-name)').forEach(el => {
+          el.style.display = lang === 'es' ? '' : 'none';
+        });
+        document.querySelectorAll('.en-t:not(.item-name)').forEach(el => {
+          el.style.display = lang === 'en' ? '' : 'none';
+        });
+      });
+    });
+
+    /* ── Category quick-jump ── */
+    const catBtns = document.querySelectorAll('.cat-jump');
+    catBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = document.getElementById(btn.dataset.target);
+        if (target) {
+          const offset = 64 + 50 + 12; // header + menu-bar + gap
+          const top = target.getBoundingClientRect().top + window.scrollY - offset;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
+      });
+    });
+
+    /* ── Active category on scroll ── */
+    const sections = document.querySelectorAll('.menu-section');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const id = e.target.id;
+          catBtns.forEach(b => b.classList.toggle('active', b.dataset.target === id));
+          // Scroll active button into view
+          const active = document.querySelector('.cat-jump.active');
+          if (active) active.scrollIntoView({ inline: 'nearest', behavior: 'smooth' });
+        }
+      });
+    }, { rootMargin: '-120px 0px -60% 0px', threshold: 0 });
+
+    sections.forEach(s => observer.observe(s));
+  </script>
+</body>
+</html>

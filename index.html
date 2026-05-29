@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ṗerSe — Cocina Itinerante · Manta</title>
+  <meta name="description" content="ṗerSe — Cocina itinerante en Manta. Barbaquillo, Manta." />
+  <!-- Akbar display font -->
+  <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/akbar" />
+
+  <style>
+    :root {
+      --green:  #1A3D2B;
+      --cream:  #F7F4EF;
+      --white:  #FFFFFF;
+      --black:  #111111;
+      --outer:  clamp(28px, 5vw, 72px);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Helvetica Now Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: var(--cream);
+      color: var(--black);
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+    /* ── Header — transparent, always white icons ─── */
+    #header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      height: 64px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0 var(--outer);
+      background: transparent;
+    }
+
+    .header-left  { display: flex; align-items: center; }
+    .header-right { display: flex; align-items: center; justify-content: flex-end; }
+
+    /* Logo — white PNG, no filter needed */
+    .header-logo {
+      display: flex; align-items: center; justify-content: center;
+    }
+    .header-logo img {
+      height: 28px; width: auto; object-fit: contain;
+      /* Logo is already white — perfect over dark photos and green bg */
+      filter: none;
+      transition: opacity 0.2s;
+    }
+    .header-logo:hover img { opacity: 0.75; }
+
+    /* Burger — white lines */
+    .burger {
+      background: none; border: none; cursor: pointer;
+      padding: 4px; display: flex; flex-direction: column; gap: 5px;
+    }
+    .burger span {
+      display: block; width: 20px; height: 1px; background: var(--white);
+    }
+
+    /* Instagram icon — white */
+    .ig-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--white); display: flex; align-items: center;
+      transition: opacity 0.2s;
+    }
+    .ig-btn:hover { opacity: 0.7; }
+    .ig-btn svg { width: 19px; height: 19px; }
+
+    /* ── Nav drawer ─────────────────────────────────── */
+    #nav-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+      z-index: 290; opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    #nav-backdrop.open { opacity: 1; pointer-events: all; }
+
+    #nav-overlay {
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: min(400px, 82vw);
+      background: var(--green); z-index: 300;
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 24px 36px 36px;
+      transform: translateX(-100%);
+      transition: transform 0.4s cubic-bezier(0.76, 0, 0.24, 1);
+      box-shadow: 6px 0 32px rgba(0,0,0,0.2);
+    }
+    #nav-overlay.open { transform: translateX(0); }
+
+    .nav-top { display: flex; justify-content: flex-end; }
+
+    .nav-close {
+      background: none; border: none; color: rgba(247,244,239,0.7);
+      font-family: inherit; font-size: 1.4rem; cursor: pointer;
+      line-height: 1; padding: 4px; transition: color 0.2s;
+    }
+    .nav-close:hover { color: var(--cream); }
+
+    .nav-links {
+      display: flex; flex-direction: column; gap: 4px;
+      flex: 1; justify-content: center;
+    }
+    .nav-links a {
+      font-size: clamp(1rem, 2.5vw, 1.25rem); font-weight: 400;
+      letter-spacing: 0.01em; color: rgba(247,244,239,0.85); line-height: 1;
+      padding: 10px 0; border-bottom: 1px solid rgba(247,244,239,0.1);
+      display: flex; justify-content: space-between; align-items: center;
+      transition: color 0.2s;
+    }
+    .nav-links a:last-child { border-bottom: none; }
+    .nav-links a:hover { color: var(--cream); }
+    .nav-links a .arrow { font-size: 0.85em; opacity: 0.5; }
+
+    .nav-bottom { }
+    .nav-location {
+      font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(247,244,239,0.4); margin-bottom: 16px;
+    }
+    .nav-ig {
+      display: flex; align-items: center; gap: 8px;
+      color: rgba(247,244,239,0.6); font-size: 0.8rem; transition: color 0.2s;
+    }
+    .nav-ig:hover { color: var(--cream); }
+    .nav-ig svg { width: 18px; height: 18px; }
+
+    /* ── Hero Slider ─────────────────────────────────── */
+    #hero {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Top gradient so header icons stay readable */
+    #hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 120px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 100%);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .slides-track {
+      display: flex; height: 100%;
+      transition: transform 0.95s cubic-bezier(0.77, 0, 0.18, 1);
+    }
+    .slide { min-width: 100%; height: 100%; }
+
+    .hero-counter {
+      position: absolute; bottom: 28px; right: var(--outer);
+      z-index: 5; font-size: 0.7rem; letter-spacing: 0.14em;
+      color: rgba(255,255,255,0.72);
+    }
+
+    .hero-dots {
+      position: absolute; bottom: 28px; left: 50%;
+      transform: translateX(-50%); z-index: 5; display: flex; gap: 8px;
+    }
+    .hero-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: rgba(255,255,255,0.38); border: none; cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .hero-dot.active { background: #fff; transform: scale(1.4); }
+
+    .hero-prev, .hero-next {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      z-index: 5; background: none; border: none; cursor: pointer;
+      color: rgba(255,255,255,0.7); font-size: 1.4rem; padding: 12px;
+      transition: color 0.25s;
+    }
+    .hero-prev:hover, .hero-next:hover { color: #fff; }
+    .hero-prev { left: var(--outer); }
+    .hero-next { right: var(--outer); }
+
+    /* ── Statement ───────────────────────────────────── */
+    #statement {
+      background: var(--green);
+      padding: clamp(80px, 12vh, 140px) var(--outer) 0;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+
+    .statement-text { flex: 1; display: flex; align-items: flex-start; }
+
+    .statement-text h2 {
+      font-family: 'Akbar', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: clamp(1.8rem, 6vw, 7rem);
+      font-weight: 400; line-height: 1.1;
+      letter-spacing: 0.01em; text-transform: uppercase;
+      color: var(--cream); hyphens: none;
+    }
+
+    /* ── Footer — kantoor style ──────────────────────── */
+    footer {
+      background: var(--green);
+      padding: clamp(36px, 6vh, 60px) var(--outer) clamp(28px, 4vh, 44px);
+    }
+
+    .footer-rule {
+      border: none;
+      border-top: 1px solid rgba(247,244,239,0.18);
+      margin-bottom: clamp(28px, 4vh, 44px);
+    }
+
+    /* Hours + address block — simple stacked, no labels */
+    .footer-info {
+      margin-bottom: clamp(24px, 3vh, 36px);
+    }
+
+    .footer-info p {
+      font-family: 'Helvetica Now Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: clamp(0.75rem, 1.4vw, 0.9rem);
+      font-weight: 700;
+      line-height: 1.85;
+      color: rgba(247,244,239,0.72);
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+    }
+
+    .footer-info .gap { margin-top: 0.85em; }
+
+    /* IG icon link */
+    .footer-ig {
+      display: inline-flex; align-items: center;
+      color: rgba(247,244,239,0.72);
+      margin-top: clamp(18px, 2.5vh, 28px);
+      transition: color 0.2s;
+    }
+    .footer-ig:hover { color: var(--cream); }
+    .footer-ig svg { width: 22px; height: 22px; }
+
+    /* Bottom row */
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: clamp(28px, 4vh, 44px);
+      border-top: 1px solid rgba(247,244,239,0.1);
+      padding-top: 18px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-copy {
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem; color: rgba(247,244,239,0.3);
+    }
+    .footer-nav { display: flex; gap: 24px; }
+    .footer-nav a {
+      font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(247,244,239,0.4); transition: color 0.2s;
+    }
+    .footer-nav a:hover { color: var(--cream); }
+
+    @media (max-width: 600px) {
+      .hero-prev, .hero-next { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ──────────────────────────────────────── -->
+  <header id="header">
+    <div class="header-left">
+      <button class="burger" id="burger" aria-label="Abrir navegación">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <a href="/" class="header-logo">
+      <img src="assets/perselogo.png" alt="ṗerSe" />
+    </a>
+
+    <div class="header-right">
+      <a href="https://www.instagram.com/perse.beach/" target="_blank" rel="noopener" class="ig-btn" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.4">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+        </svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- ── Nav backdrop ────────────────────────────────── -->
+  <div id="nav-backdrop"></div>
+
+  <!-- ── Nav drawer ──────────────────────────────────── -->
+  <nav id="nav-overlay" role="dialog" aria-modal="true" aria-label="Navegación">
+    <div class="nav-top">
+      <button class="nav-close" id="nav-close" aria-label="Cerrar">&times;</button>
+    </div>
+    <div class="nav-links">
+      <a href="/">Inicio</a>
+      <a href="#statement">Nosotros</a>
+      <a href="menu.html">Menú <span class="arrow">→</span></a>
+      <a href="https://maps.app.goo.gl/Ufk9RH8gDcRQ3Ggm9" target="_blank" rel="noopener">Ubicación <span class="arrow">→</span></a>
+    </div>
+    <div class="nav-bottom">
+      <p class="nav-location">Barbaquillo, Manta</p>
+      <a href="https://www.instagram.com/perse.beach/" target="_blank" rel="noopener" class="nav-ig">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.4">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+        </svg>
+        @perse.beach
+      </a>
+    </div>
+  </nav>
+
+  <!-- ── Hero Slider ─────────────────────────────────── -->
+  <section id="hero" aria-label="Galería">
+    <div class="slides-track" id="slides-track">
+      <div class="slide"><img src="assets/photos-space/SnapInsta.to_694882466_17887331070537687_5907915418718741722_n.jpg" alt="ṗerSe" /></div>
+      <div class="slide"><img src="assets/photos-space/SnapInsta.to_695829331_17887331133537687_2776337424432298465_n.jpg" alt="ṗerSe" /></div>
+      <div class="slide"><img src="assets/photos-space/SnapInsta.to_696298403_17887331079537687_1332557630763001766_n.jpg" alt="ṗerSe" /></div>
+      <div class="slide"><img src="assets/photos-space/SnapInsta.to_696685601_17887331151537687_8893715734883464415_n.jpg" alt="ṗerSe" /></div>
+      <div class="slide"><img src="assets/photos-space/SnapInsta.to_697142005_17887331058537687_6298127088937791850_n.jpg" alt="ṗerSe" /></div>
+    </div>
+    <button class="hero-prev" id="hero-prev" aria-label="Anterior">&#8592;</button>
+    <button class="hero-next" id="hero-next" aria-label="Siguiente">&#8594;</button>
+    <span class="hero-counter" id="hero-counter">1 / 8</span>
+    <div class="hero-dots" id="hero-dots"></div>
+  </section>
+
+  <!-- ── Statement ───────────────────────────────────── -->
+  <section id="statement">
+    <div class="statement-text">
+      <h2>Cocina itinerante con drinks en Manta, curada por un grupo de panas apasionados por la comida ecuatoriana.</h2>
+    </div>
+  </section>
+
+  <!-- ── Footer ──────────────────────────────────────── -->
+  <footer id="footer">
+    <hr class="footer-rule" />
+
+    <div class="footer-info">
+      <p>Dom &nbsp;11:00 - 16:00</p>
+      <p>Lun &nbsp;Cerrado</p>
+      <p>Mar - Jue &nbsp;11:00 - 23:00</p>
+      <p>Vie, Sáb &nbsp;12:00 - 00:00</p>
+      <p class="gap">
+        <a href="https://maps.app.goo.gl/Ufk9RH8gDcRQ3Ggm9" target="_blank" rel="noopener" style="color:inherit;">
+          Barbaquillo, Manta, Ecuador
+        </a>
+      </p>
+    </div>
+
+    <a href="https://www.instagram.com/perse.beach/" target="_blank" rel="noopener" class="footer-ig" aria-label="Instagram">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.3">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+        <circle cx="12" cy="12" r="4"/>
+        <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+      </svg>
+    </a>
+
+    <div class="footer-bottom">
+      <span class="footer-copy">&copy; 2025 ṗerSe</span>
+      <nav class="footer-nav">
+        <a href="menu.html">Menú</a>
+        <a href="https://maps.app.goo.gl/Ufk9RH8gDcRQ3Ggm9" target="_blank" rel="noopener">Ubicación</a>
+        <a href="https://www.instagram.com/perse.beach/" target="_blank" rel="noopener">Instagram</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    /* ── Nav drawer ── */
+    const burger     = document.getElementById('burger');
+    const backdrop   = document.getElementById('nav-backdrop');
+    const navOverlay = document.getElementById('nav-overlay');
+    const navClose   = document.getElementById('nav-close');
+
+    function openNav()  { navOverlay.classList.add('open'); backdrop.classList.add('open'); document.body.style.overflow = 'hidden'; }
+    function closeNav() { navOverlay.classList.remove('open'); backdrop.classList.remove('open'); document.body.style.overflow = ''; }
+
+    burger.addEventListener('click', openNav);
+    navClose.addEventListener('click', closeNav);
+    backdrop.addEventListener('click', closeNav);
+    navOverlay.querySelectorAll('a').forEach(a => a.addEventListener('click', closeNav));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
+
+    /* ── Hero slider ── */
+    const track    = document.getElementById('slides-track');
+    const counter  = document.getElementById('hero-counter');
+    const dotsWrap = document.getElementById('hero-dots');
+    const total    = track.children.length;
+    let cur = 0, timer;
+
+    for (let i = 0; i < total; i++) {
+      const d = document.createElement('button');
+      d.className = 'hero-dot' + (i === 0 ? ' active' : '');
+      d.setAttribute('aria-label', 'Foto ' + (i + 1));
+      d.addEventListener('click', () => { goto(i); reset(); });
+      dotsWrap.appendChild(d);
+    }
+
+    function goto(n) {
+      cur = (n + total) % total;
+      track.style.transform = 'translateX(-' + (cur * 100) + '%)';
+      counter.textContent = (cur + 1) + ' / ' + total;
+      dotsWrap.querySelectorAll('.hero-dot').forEach((d, i) =>
+        d.classList.toggle('active', i === cur)
+      );
+    }
+
+    function reset() {
+      clearInterval(timer);
+      timer = setInterval(() => goto(cur + 1), 5500);
+    }
+
+    document.getElementById('hero-next').addEventListener('click', () => { goto(cur + 1); reset(); });
+    document.getElementById('hero-prev').addEventListener('click', () => { goto(cur - 1); reset(); });
+
+    let touchX = 0;
+    track.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+    track.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - touchX;
+      if (Math.abs(dx) > 45) { dx < 0 ? goto(cur + 1) : goto(cur - 1); reset(); }
+    });
+
+    reset();
+  </script>
+</body>
+</html>
