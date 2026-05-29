@@ -27,13 +27,14 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: auto; }
 
     body {
       font-family: 'Helvetica Now Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
       background: url('assets/fondo1.png') repeat; background-size: 400px auto;
       color: var(--black);
       overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
     }
 
     a { color: inherit; text-decoration: none; }
@@ -1374,30 +1375,41 @@
 
     /* ── Category quick-jump ── */
     const catBtns = document.querySelectorAll('.cat-jump');
+    const OFFSET = 64 + 50 + 12; // header + menu-bar + gap
+    let isScrolling = false;
+
     catBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const target = document.getElementById(btn.dataset.target);
-        if (target) {
-          const offset = 64 + 50 + 12; // header + menu-bar + gap
-          const top = target.getBoundingClientRect().top + window.scrollY - offset;
-          window.scrollTo({ top, behavior: 'smooth' });
-        }
+        if (!target) return;
+        isScrolling = true;
+        const top = target.getBoundingClientRect().top + window.scrollY - OFFSET;
+        window.scrollTo({ top, behavior: 'smooth' });
+        setTimeout(() => { isScrolling = false; }, 800);
       });
     });
 
     /* ── Active category on scroll ── */
     const sections = document.querySelectorAll('.menu-section');
+
+    function setActive(id) {
+      catBtns.forEach(b => b.classList.toggle('active', b.dataset.target === id));
+      const active = document.querySelector('.cat-jump.active');
+      if (active) {
+        const scroll = active.parentElement;
+        const btnLeft = active.offsetLeft;
+        const btnWidth = active.offsetWidth;
+        const scrollWidth = scroll.offsetWidth;
+        scroll.scrollLeft = btnLeft - (scrollWidth / 2) + (btnWidth / 2);
+      }
+    }
+
     const observer = new IntersectionObserver(entries => {
+      if (isScrolling) return;
       entries.forEach(e => {
-        if (e.isIntersecting) {
-          const id = e.target.id;
-          catBtns.forEach(b => b.classList.toggle('active', b.dataset.target === id));
-          // Scroll active button into view
-          const active = document.querySelector('.cat-jump.active');
-          if (active) active.scrollIntoView({ inline: 'nearest', behavior: 'smooth' });
-        }
+        if (e.isIntersecting) setActive(e.target.id);
       });
-    }, { rootMargin: '-120px 0px -60% 0px', threshold: 0 });
+    }, { rootMargin: `-${OFFSET}px 0px -55% 0px`, threshold: 0 });
 
     sections.forEach(s => observer.observe(s));
   </script>
