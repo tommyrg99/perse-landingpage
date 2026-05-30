@@ -1370,6 +1370,18 @@
         document.querySelectorAll('.en-t:not(.item-name)').forEach(el => {
           el.style.display = lang === 'en' ? '' : 'none';
         });
+
+        // Toggle item names in Grill, Drinks and Chef's Specials sections
+        ['cortes', 'bebidas', 'chef'].forEach(sectionId => {
+          const section = document.getElementById(sectionId);
+          if (!section) return;
+          section.querySelectorAll('.item-name.es-t').forEach(el => {
+            el.style.display = lang === 'es' ? '' : 'none';
+          });
+          section.querySelectorAll('.item-name.en-t').forEach(el => {
+            el.style.display = lang === 'en' ? '' : 'none';
+          });
+        });
       });
     });
 
