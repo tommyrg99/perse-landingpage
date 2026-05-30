@@ -108,11 +108,14 @@
       flex: 1; justify-content: center;
     }
     .nav-links a {
-      font-size: clamp(1rem, 2.5vw, 1.25rem); font-weight: 400;
+      font-size: clamp(1rem, 2.5vw, 1.25rem); font-weight: 700;
       letter-spacing: 0.01em; color: rgba(247,244,239,0.85); line-height: 1;
       padding: 10px 0; border-bottom: 1px solid rgba(247,244,239,0.1);
       display: flex; justify-content: space-between; align-items: center;
-      transition: color 0.2s;
+      transition: color 0.2s; text-transform: lowercase;
+    }
+    .nav-links a.nav-menu {
+      font-size: clamp(1.15rem, 2.875vw, 1.4375rem);
     }
     .nav-links a:last-child { border-bottom: none; }
     .nav-links a:hover { color: var(--cream); }
@@ -300,7 +303,7 @@
     <div class="nav-links">
       <a href="/">Inicio</a>
       <a href="#statement">Nosotros</a>
-      <a href="menu.html">Menú <span class="arrow">→</span></a>
+      <a href="menu.html" class="nav-menu">menú <span class="arrow">→</span></a>
       <a href="https://maps.app.goo.gl/Ufk9RH8gDcRQ3Ggm9" target="_blank" rel="noopener">Ubicación <span class="arrow">→</span></a>
     </div>
     <div class="nav-bottom">
